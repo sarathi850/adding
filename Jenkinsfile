@@ -13,14 +13,14 @@ pipeline{
         stage("Maven Build"){
             steps{
                 sh "mvn clean package"
-                sh "mv target/*.war target/myweb.war"
+                sh "mv target/*.war target/adding.war"
             }
         }
         stage("deploy-dev"){
             steps{
                 sshagent(['tomcat-new']) {
                 sh """
-                    mv -o StrictHostKeyChecking=no target/myweb.war  centos@13.235.254.20:/opt/tomcat/apache-tomcat-9.0.56/webapps/
+                    mv target/myweb.war  centos@13.235.254.20:/opt/tomcat/apache-tomcat-9.0.56/webapps/
                     
                     ssh centos@13.235.254.20 /opt/tomcat/apache-tomcat-9.0.56/bin/shutdown.sh
                     
