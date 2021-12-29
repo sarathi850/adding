@@ -1,20 +1,36 @@
-pipeline {
-  agent any 
-  stages {
-    stage("Build") {
-      steps {
-        echo "welcome to jenkins"
-      }
+pipeline{
+    agent any
+    
+    environment{
+        PATH = "/opt/maven3/bin:$PATH"
     }
-    stage("Test") {
-      steps {
-        echo "test file"
-      }
+    stages{
+        stage("Git Checkout"){
+            steps{
+                git credentialsId: 'javahome2', url: 'https://github.com/srinivas1987devops/myweb.git'
+            }
+        }
+        stage("Maven Build"){
+            steps{
+                sh "mvn clean package"
+                sh "mv target/*.war target/myweb.war"
+            }
+        }
+        stage("deploy-dev"){
+            steps{
+                sshagent(['tomcat-new']) {
+                sh """
+                    scp -o StrictHostKeyChecking=no target/myweb.war  ec2-user@172.31.47.207:/home/ec2-user/apache-tomcat-9.0.56/webapps/
+                    
+                    ssh ec2-user@172.31.47.207 /home/ec2-user/apache-tomcat-9.0.56/bin/shutdown.sh
+                    
+                    ssh ec2-user@172.31.47.207 /home/ec2-user/apache-tomcat-9.0.56/bin/startup.sh
+                
+                """
+            }
+            
+            }
+        }
     }
-    stage("Deploy") {
-      steps {
-        echo "welcome to deploy"
-      }
-          }
-          }
-          }
+}
+     
