@@ -11,7 +11,7 @@ pipeline {
         echo "test file"
       }
     }
-    stage("Deploy) {
+    stage("Deploy") {
       steps {
         echo "welcome to deploy"
       }
